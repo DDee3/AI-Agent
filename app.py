@@ -5,6 +5,10 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google import genai
+from dotenv import load_dotenv
+
+# Load local .env if it exists
+load_dotenv()
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -12,27 +16,33 @@ app = Flask(__name__)
 # Define the required scope for reading Gmail
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
-# Initialize Gemini Client (Replace with your actual API key)
-GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"
+# Initialize Gemini Client using the environment variable
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
 ai_client = genai.Client(api_key=GEMINI_API_KEY)
 
 def get_gmail_service():
     """Authenticate and connect to the Gmail API."""
     creds = None
+    
+    # Define the absolute directory path where your script lives
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    token_path = os.path.join(BASE_DIR, 'token.json')
+    creds_path = os.path.join(BASE_DIR, 'credentials.json')
+    
     # token.json stores the user's access and refresh tokens
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     
     # If there are no valid credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(creds_path, SCOPES)
             creds = flow.run_local_server(port=0)
             
         # Save the credentials for the next run
-        with open('token.json', 'w') as token:
+        with open(token_path, 'w') as token:
             token.write(creds.to_json())
             
     return build('gmail', 'v1', credentials=creds)
@@ -54,7 +64,7 @@ def analyze_email_with_gemini(sender, subject, body):
     """
     
     response = ai_client.models.generate_content(
-        model='gemini-3.6-flash',
+        model='gemini-2.5-flash',
         contents=prompt,
     )
     return response.text

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Email Assistant</title>
+    <style>
+        /* သပ်ရပ်လှပတဲ့ နောက်ခံအရောင် */
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+        /* Bento Grid စနစ် */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Glassmorphism ကတ်ဒီဇိုင်း */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 25px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+        }
+        .email-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .sender {
+            font-weight: bold;
+            color: #fff;
+            font-size: 1.1em;
+        }
+        .subject {
+            color: #eee;
+            margin-top: 5px;
+            font-size: 0.95em;
+        }
+        .ai-analysis {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            line-height: 1.6;
+            white-space: pre-wrap; /* AI ရဲ့ စာပိုဒ်တွေကို သေသေချာချာ ပေါ်စေရန် */
+        }
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✨ AI Email Assistant ✨</h1>
+
+    <div class="grid-container">
+        <!-- အီးမေးလ် မရှိရင် ပြမယ့်စာ -->
+        {% if not emails %}
+            <div class="glass-card">
+                <div class="loading">မဖတ်ရသေးတဲ့ အီးမေးလ် မရှိပါဘူး။ ရှင်းလင်းနေပါတယ်။ 🥳</div>
+            </div>
+        {% endif %}
+
+        <!-- Python က ပို့လိုက်တဲ့ အီးမေးလ်တွေကို တစ်ကတ်ချင်းစီ ထုတ်ပြခြင်း -->
+        {% for email in emails %}
+        <div class="glass-card">
+            <div class="email-header">
+                <div class="sender">From: {{ email.sender }}</div>
+                <div class="subject">Subject: {{ email.subject }}</div>
+            </div>
+            <div class="ai-analysis">{{ email.analysis }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
